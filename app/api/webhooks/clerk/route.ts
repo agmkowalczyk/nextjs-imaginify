@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Webhook } from 'svix'
 
-import { createUser, updateUser } from '@/lib/actions/user.actions'
+import { createUser, deleteUser, updateUser } from '@/lib/actions/user.actions'
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET
@@ -97,6 +97,15 @@ export async function POST(req: Request) {
     const updatedUser = await updateUser(id, user)
 
     return NextResponse.json({ message: 'OK', user: updatedUser })
+  }
+
+  // DELETE
+  if (eventType === 'user.deleted') {
+    const { id } = evt.data
+
+    const deletedUser = await deleteUser(id!)
+
+    return NextResponse.json({ message: 'OK', user: deletedUser })
   }
 
   console.log(`Webhook with and ID of ${id} and type of ${eventType}`)
