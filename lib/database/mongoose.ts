@@ -8,7 +8,7 @@ interface MongooseConnection {
 }
 
 let cached: MongooseConnection = (global as any).mongoose
-console.log(1, global)
+
 if (!cached) {
   cached = (global as any).mongoose = {
     connected: null,
