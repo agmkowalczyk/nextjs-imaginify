@@ -4,21 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
+import { defaultValues, transformationTypes } from '@/constants'
 import { CustomField } from './CustomField'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useState } from 'react'
-import { AspectRatioKey } from '@/lib/utils'
+import Fill from './elements/Fill'
+import Recolor from './elements/Recolor'
+import Prompt from './elements/Prompt'
 
 export const formSchema = z.object({
   title: z.string(),
@@ -61,7 +54,17 @@ const TransformationForm = ({
     console.log(values)
   }
 
-  const onSelectFieldHandler = (value: string, onChangeField: (value: string) => void) => { }
+  const onSelectFieldHandler = (
+    value: string,
+    onChangeField: (value: string) => void
+  ) => {}
+
+  const onInputChangeHandler = (
+    fieldName: string,
+    value: string,
+    type: string,
+    onChangeField: (value: string) => void
+  ) => {}
 
   return (
     <Form {...form}>
@@ -74,32 +77,21 @@ const TransformationForm = ({
           render={({ field }) => <Input {...field} className='input-field' />}
         />
 
-        {type === 'fill' && (
-          <CustomField
-            control={form.control}
-            name='aspectRatio'
-            formLabel='Aspect Ratio'
-            className='w-full'
-            render={({ field }) => (
-              <Select
-                onValueChange={(value) =>
-                  onSelectFieldHandler(value, field.onChange)
-                }
-                value={field.value}
-              >
-                <SelectTrigger className='select-field'>
-                  <SelectValue placeholder='Select size' />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.keys(aspectRatioOptions).map((key) => (
-                    <SelectItem key={key} value={key} className='select-item'>
-                      {aspectRatioOptions[key as AspectRatioKey].label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {type === 'fill' && <Fill control={form.control} />}
+        {(type === 'remove' || type === 'recolor') && (
+          <div className='prompt-field'>
+            <Prompt
+              control={form.control}
+              type={type}
+              onInputChangeHandler={onInputChangeHandler}
+            />
+            {type === 'recolor' && (
+              <Recolor
+                control={form.control}
+                onInputChangeHandler={onInputChangeHandler}
+              />
             )}
-          />
+          </div>
         )}
         <Button type='submit'>Submit</Button>
       </form>
