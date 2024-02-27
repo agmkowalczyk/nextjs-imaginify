@@ -31,6 +31,9 @@ const TransformationForm = ({
   const [image, setImage] = useState(data)
   const [newTransformation, setNewTransformation] =
     useState<Transformations | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [transformationConfig, setTransformationConfig] = useState(config)
+  const [isTransforming, setIsTransforming] = useState(false)
 
   const initialValues =
     data && action === 'Update'
@@ -64,6 +67,8 @@ const TransformationForm = ({
     onChangeField: (value: string) => void
   ) => {}
 
+  const onTransformHandler = () => { }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
@@ -75,7 +80,9 @@ const TransformationForm = ({
           render={({ field }) => <Input {...field} className='input-field' />}
         />
 
-        {type === 'fill' && <Fill control={form.control} />}
+        {type === 'fill' && (
+          <Fill control={form.control} onSelectFieldHandler={ onSelectFieldHandler} />
+        )}
         {(type === 'remove' || type === 'recolor') && (
           <div className='prompt-field'>
             <Prompt
@@ -91,7 +98,25 @@ const TransformationForm = ({
             )}
           </div>
         )}
-        <Button type='submit'>Submit</Button>
+
+        <div className='flex flex-col gap-4'>
+          <Button
+            type='button'
+            className='submit-button capitalize'
+            disabled={isTransforming || newTransformation === null}
+            onClick={onTransformHandler}
+          >
+            {isTransforming ? 'Transforming...' : 'Apply Transformation'}
+          </Button>
+
+          <Button
+            type='submit'
+            className='submit-button capitalize'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Save Image'}
+          </Button>
+        </div>
       </form>
     </Form>
   )

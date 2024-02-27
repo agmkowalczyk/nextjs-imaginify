@@ -14,14 +14,13 @@ import { formSchema } from '../TransformationForm'
 
 type Props = {
   control: Control<z.infer<typeof formSchema>> | undefined
-}
-
-const Fill = ({ control }: Props) => {
-  const onSelectFieldHandler = (
+  onSelectFieldHandler: (
     value: string,
     onChangeField: (value: string) => void
-  ) => {}
+  ) => void
+}
 
+const Fill = ({ control, onSelectFieldHandler }: Props) => {
   return (
     <CustomField
       control={control}
