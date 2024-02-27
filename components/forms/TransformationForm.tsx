@@ -9,9 +9,7 @@ import { Input } from '@/components/ui/input'
 import { defaultValues, transformationTypes } from '@/constants'
 import { CustomField } from './CustomField'
 import { useState } from 'react'
-import Fill from './elements/Fill'
-import Recolor from './elements/Recolor'
-import Prompt from './elements/Prompt'
+import { Fill, Prompt, Recolor } from './elements'
 
 export const formSchema = z.object({
   title: z.string(),
