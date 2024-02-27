@@ -10,14 +10,11 @@ import { aspectRatioOptions } from '@/constants'
 import { AspectRatioKey } from '@/lib/utils'
 import { Control } from 'react-hook-form'
 import { z } from 'zod'
-import { formSchema } from '../TransformationForm'
+import { OnSelectFieldHandlerType, formSchema } from '../TransformationForm'
 
 type Props = {
   control: Control<z.infer<typeof formSchema>> | undefined
-  onSelectFieldHandler: (
-    value: string,
-    onChangeField: (value: string) => void
-  ) => void
+  onSelectFieldHandler: OnSelectFieldHandlerType
 }
 
 const Fill = ({ control, onSelectFieldHandler }: Props) => {

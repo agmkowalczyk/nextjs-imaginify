@@ -6,10 +6,16 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { defaultValues, transformationTypes } from '@/constants'
+import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
 import { CustomField } from './CustomField'
 import { useState } from 'react'
 import { Fill, Prompt, Recolor } from './elements'
+import { AspectRatioKey } from '@/lib/utils'
+
+export type OnSelectFieldHandlerType = (
+    value: string,
+    onChangeField: (value: string) => void
+  ) => void
 
 export const formSchema = z.object({
   title: z.string(),
@@ -56,9 +62,21 @@ const TransformationForm = ({
   }
 
   const onSelectFieldHandler = (
-    value: string,
-    onChangeField: (value: string) => void
-  ) => {}
+    ...[value, onChangeField]: Parameters<OnSelectFieldHandlerType>
+  ): ReturnType<OnSelectFieldHandlerType> => {
+    const imageSize = aspectRatioOptions[value as AspectRatioKey]
+
+    setImage((prevState: any) => ({
+      ...prevState,
+      aspectRatio: imageSize.aspectRatio,
+      width: imageSize.width,
+      height: imageSize.height,
+    }))
+
+    setNewTransformation(transformationType.config)
+
+    return onChangeField(value)
+  }
 
   const onInputChangeHandler = (
     fieldName: string,
