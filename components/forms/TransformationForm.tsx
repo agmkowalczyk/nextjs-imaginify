@@ -6,16 +6,27 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
+import {
+  aspectRatioOptions,
+  defaultValues,
+  transformationTypes,
+} from '@/constants'
 import { CustomField } from './CustomField'
 import { useState } from 'react'
 import { Fill, Prompt, Recolor } from './elements'
-import { AspectRatioKey } from '@/lib/utils'
+import { AspectRatioKey, debounce } from '@/lib/utils'
 
 export type OnSelectFieldHandlerType = (
-    value: string,
-    onChangeField: (value: string) => void
-  ) => void
+  value: string,
+  onChangeField: (value: string) => void
+) => void
+
+export type OnInputChangeHandlerType = (
+  fieldName: string,
+  value: string,
+  type: string,
+  onChangeField: (value: string) => void
+) => void
 
 export const formSchema = z.object({
   title: z.string(),
@@ -79,13 +90,27 @@ const TransformationForm = ({
   }
 
   const onInputChangeHandler = (
-    fieldName: string,
-    value: string,
-    type: string,
-    onChangeField: (value: string) => void
-  ) => {}
+    ...[
+      fieldName,
+      value,
+      type,
+      onChangeField,
+    ]: Parameters<OnInputChangeHandlerType>
+  ): ReturnType<OnInputChangeHandlerType> => {
+    debounce(() => {
+      setNewTransformation((prevState: any) => ({
+        ...prevState,
+        [type]: {
+          ...prevState?.[type],
+          [fieldName === 'prompt' ? 'prompt' : 'to']: value,
+        },
+      }))
+    }, 1000)()
 
-  const onTransformHandler = () => { }
+    return onChangeField(value)
+  }
+
+  const onTransformHandler = () => {}
 
   return (
     <Form {...form}>
@@ -99,7 +124,10 @@ const TransformationForm = ({
         />
 
         {type === 'fill' && (
-          <Fill control={form.control} onSelectFieldHandler={ onSelectFieldHandler} />
+          <Fill
+            control={form.control}
+            onSelectFieldHandler={onSelectFieldHandler}
+          />
         )}
         {(type === 'remove' || type === 'recolor') && (
           <div className='prompt-field'>

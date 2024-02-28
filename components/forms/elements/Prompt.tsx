@@ -1,18 +1,13 @@
 import { Control } from 'react-hook-form'
 import { z } from 'zod'
-import { formSchema } from '../TransformationForm'
+import { OnInputChangeHandlerType, formSchema } from '../TransformationForm'
 import { CustomField } from '../CustomField'
 import { Input } from '@/components/ui/input'
 
 type Props = {
   control: Control<z.infer<typeof formSchema>> | undefined
   type: string
-  onInputChangeHandler: (
-    fieldName: string,
-    value: string,
-    type: string,
-    onChangeField: (value: string) => void
-  ) => void
+  onInputChangeHandler: OnInputChangeHandlerType
 }
 
 const Prompt = ({ control, type, onInputChangeHandler }: Props) => {
