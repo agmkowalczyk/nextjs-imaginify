@@ -12,9 +12,9 @@ import {
   transformationTypes,
 } from '@/constants'
 import { CustomField } from './CustomField'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { Fill, Prompt, Recolor } from './elements'
-import { AspectRatioKey, debounce } from '@/lib/utils'
+import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
 
 export type OnSelectFieldHandlerType = (
   value: string,
@@ -51,6 +51,7 @@ const TransformationForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [transformationConfig, setTransformationConfig] = useState(config)
   const [isTransforming, setIsTransforming] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const initialValues =
     data && action === 'Update'
@@ -110,7 +111,19 @@ const TransformationForm = ({
     return onChangeField(value)
   }
 
-  const onTransformHandler = () => {}
+  const onTransformHandler = () => {
+     setIsTransforming(true)
+
+     setTransformationConfig(
+       deepMergeObjects(newTransformation, transformationConfig)
+     )
+
+     setNewTransformation(null)
+
+     startTransition(async () => {
+      //  await updateCredits(userId, creditFee)
+     })
+  }
 
   return (
     <Form {...form}>
