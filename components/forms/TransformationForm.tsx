@@ -16,6 +16,7 @@ import { useState, useTransition } from 'react'
 import { Fill, Prompt, Recolor } from './elements'
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
 import MediaUploader from '../shared/MediaUploader'
+import TransformedImage from '../shared/TransformedImage'
 
 export type OnSelectFieldHandlerType = (
   value: string,
@@ -173,6 +174,15 @@ const TransformationForm = ({
                 type={type}
               />
             )}
+          />
+
+          <TransformedImage
+            image={image}
+            type={type}
+            title={form.getValues().title}
+            isTransforming={isTransforming}
+            setIsTransforming={setIsTransforming}
+            transformationConfig={transformationConfig}
           />
         </div>
 
