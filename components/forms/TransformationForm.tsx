@@ -17,6 +17,7 @@ import { Fill, Prompt, Recolor } from './elements'
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
 import MediaUploader from '../shared/MediaUploader'
 import TransformedImage from '../shared/TransformedImage'
+import { updateCredits } from '@/lib/actions/user.actions'
 
 export type OnSelectFieldHandlerType = (
   value: string,
@@ -114,17 +115,18 @@ const TransformationForm = ({
   }
 
   const onTransformHandler = () => {
-     setIsTransforming(true)
+    setIsTransforming(true)
 
-     setTransformationConfig(
-       deepMergeObjects(newTransformation, transformationConfig)
-     )
+    setTransformationConfig(
+      deepMergeObjects(newTransformation, transformationConfig)
+    )
 
-     setNewTransformation(null)
+    setNewTransformation(null)
 
-     startTransition(async () => {
-      //  await updateCredits(userId, creditFee)
-     })
+    startTransition(async () => {
+      const creditFee = -1
+      await updateCredits(userId, creditFee)
+    })
   }
 
   return (
