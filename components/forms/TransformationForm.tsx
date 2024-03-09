@@ -8,11 +8,12 @@ import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
   aspectRatioOptions,
+  creditFee,
   defaultValues,
   transformationTypes,
 } from '@/constants'
 import { CustomField } from './CustomField'
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Fill, Prompt, Recolor } from './elements'
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
 import MediaUploader from '../shared/MediaUploader'
@@ -21,7 +22,7 @@ import { updateCredits } from '@/lib/actions/user.actions'
 import { getCldImageUrl } from 'next-cloudinary'
 import { addImage, updateImage } from '@/lib/actions/image.actions'
 import { useRouter } from 'next/navigation'
-
+import { InsufficientCreditsModal } from '../shared/InsufficientCreditsModal'
 
 export type OnSelectFieldHandlerType = (
   value: string,
@@ -60,7 +61,7 @@ const TransformationForm = ({
   const [isTransforming, setIsTransforming] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
-  
+
   const initialValues =
     data && action === 'Update'
       ? {
@@ -85,57 +86,57 @@ const TransformationForm = ({
         width: image?.width,
         height: image?.height,
         src: image?.publicId,
-        ...transformationConfig
+        ...transformationConfig,
       })
 
-       const imageData = {
-         title: values.title,
-         publicId: image?.publicId,
-         transformationType: type,
-         width: image?.width,
-         height: image?.height,
-         config: transformationConfig,
-         secureURL: image?.secureURL,
-         transformationURL: transformationUrl,
-         aspectRatio: values.aspectRatio,
-         prompt: values.prompt,
-         color: values.color,
+      const imageData = {
+        title: values.title,
+        publicId: image?.publicId,
+        transformationType: type,
+        width: image?.width,
+        height: image?.height,
+        config: transformationConfig,
+        secureURL: image?.secureURL,
+        transformationURL: transformationUrl,
+        aspectRatio: values.aspectRatio,
+        prompt: values.prompt,
+        color: values.color,
       }
-      
-       if(action === 'Add') {
+
+      if (action === 'Add') {
         try {
           const newImage = await addImage({
             image: imageData,
             userId,
-            path: '/'
+            path: '/',
           })
 
-          if(newImage) {
+          if (newImage) {
             form.reset()
             setImage(data)
             router.push(`/transformations/${newImage._id}`)
           }
         } catch (error) {
-          console.log(error);
+          console.log(error)
         }
       }
 
-      if(action === 'Update') {
+      if (action === 'Update') {
         try {
           const updatedImage = await updateImage({
             image: {
               ...imageData,
-              _id: data._id
+              _id: data._id,
             },
             userId,
-            path: `/transformations/${data._id}`
+            path: `/transformations/${data._id}`,
           })
 
-          if(updatedImage) {
+          if (updatedImage) {
             router.push(`/transformations/${updatedImage._id}`)
           }
         } catch (error) {
-          console.log(error);
+          console.log(error)
         }
       }
     }
@@ -191,14 +192,21 @@ const TransformationForm = ({
     setNewTransformation(null)
 
     startTransition(async () => {
-      const creditFee = -1
       await updateCredits(userId, creditFee)
     })
   }
 
+  useEffect(() => {
+    if (image && (type === 'restore' || type === 'removeBackground')) {
+      setNewTransformation(transformationType.config)
+    }
+  }, [image, transformationType.config, type])
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+        {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal />}
         <CustomField
           control={form.control}
           name='title'
