@@ -1,4 +1,4 @@
-import { Schema, model, models } from 'mongoose'
+import { Document, Schema, model, models } from 'mongoose'
 
 const ImageSchema = new Schema({
   title: { type: String, required: true },
