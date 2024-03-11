@@ -1,6 +1,7 @@
-import { aspectRatioOptions } from "@/constants"
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { aspectRatioOptions } from '@/constants'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+import qs from 'qs'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -81,13 +82,43 @@ const shimmer = (w: number, h: number) => `
   <rect width="${w}" height="${h}" fill="#7986AC" />
   <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
+</svg>`
 
 const toBase64 = (str: string) =>
-  typeof window === "undefined"
-    ? Buffer.from(str).toString("base64")
-    : window.btoa(str);
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str)
 
 export const dataUrl = `data:image/svg+xml;base64,${toBase64(
   shimmer(1000, 1000)
-)}`;
+)}`
+
+export const formUrlQuery = ({
+  searchParams,
+  key,
+  value,
+}: FormUrlQueryParams) => {
+  const params = { ...qs.parse(searchParams.toString()), [key]: value }
+
+  return `${window.location.pathname}?${qs.stringify(params, {
+    skipNulls: true,
+  })}`
+}
+
+export function removeKeysFromQuery({
+  searchParams,
+  keysToRemove,
+}: RemoveUrlQueryParams) {
+  const currentUrl = qs.parse(searchParams)
+
+  keysToRemove.forEach((key) => {
+    delete currentUrl[key]
+  })
+
+  // Remove null or undefined values
+  Object.keys(currentUrl).forEach(
+    (key) => currentUrl[key] == null && delete currentUrl[key]
+  )
+
+  return `${window.location.pathname}?${qs.stringify(currentUrl)}`
+}
