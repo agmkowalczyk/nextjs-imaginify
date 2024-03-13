@@ -8,11 +8,12 @@ import { handleError } from '../utils'
 import { redirect } from 'next/navigation'
 import { v2 as cloudinary } from 'cloudinary'
 
-const populateUser = (query: any) => query.populate({
-  path: 'author',
-  model: User,
-  select: '_id firstName lastName clerkId'
-})
+const populateUser = (query: any) =>
+  query.populate({
+    path: 'author',
+    model: User,
+    select: '_id firstName lastName clerkId',
+  })
 
 export async function addImage({ image, userId, path }: AddImageParams) {
   try {
@@ -129,6 +130,20 @@ export async function getAllImages({
       totalPage: Math.ceil(totalImages / limit),
       savedImages,
     }
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+export async function getImageById(imageId: string) {
+  try {
+    await connectToDatabase()
+
+    const image = await populateUser(Image.findById(imageId))
+
+    if (!image) throw new Error('Image not found')
+
+    return JSON.parse(JSON.stringify(image))
   } catch (error) {
     handleError(error)
   }
