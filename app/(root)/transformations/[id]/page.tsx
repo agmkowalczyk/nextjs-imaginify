@@ -1,3 +1,4 @@
+import { DeleteConfirmation } from '@/components/shared/DeleteConfirmation'
 import Header from '@/components/shared/Header'
 import TransformedImage from '@/components/shared/TransformedImage'
 import { Button } from '@/components/ui/button'
@@ -78,13 +79,15 @@ const TransformationsPage = async ({ params: { id } }: SearchParamProps) => {
           />
         </div>
 
-        {userId === image.author._id && (
+        {userId === image.author.clerkId && (
           <div className='mt-4 space-y-4'>
             <Button asChild type='button' className='submit-button capitalize'>
               <Link href={`/transformations/${image._id}/update`}>
                 Update Image
               </Link>
             </Button>
+
+            <DeleteConfirmation imageId={image._id} />
           </div>
         )}
       </section>
